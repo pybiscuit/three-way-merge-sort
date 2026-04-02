@@ -12,9 +12,54 @@ Project:
     Filter-Based Breach Detection at Scale
 Filename: bloom_filter.py
 """
+import math
+from hashing import Hashing
+
+HASH_SEED = 0xCAFEBABE_DEAD10CC
 
 class BloomFilter:
-    def __init__(self): ...
+    def __init__(self):
+        self.filter = self.init_filter()
+        self.params = Hashing.make_params(7, 2**160+13, HASH_SEED)
+
+    def insert(self): ...
+        # convert password from hex -> int
+        # run hashing on the int and flip the 0 bits at the specified locs
+        
+    def query(self): ...
+        # convert password from hex -> int
+        # run hashing on the int and check the bits at the specified locs
+        # return true if matchall else false.
+
+    @timed
+    def build(self): ...
+        # open training file
+        # for each pw:
+        # convert to integer k_int
+        # run k_int through hash 7 times
+        # flip the bit at each index returned
+
+    def read_training(self): ...
+        # read password from training.txt
+
+    def read_holdout(self): ...
+        # read passwords from holdout.txt
+
+    def init_filter(self):
+        return bytearray(math.ceil(8_700_000/8))
+
+    @timed
+    def query_analysis(self): ...
+        # loop over 1000 passwords querying them.
+        
+
+    def timed(func):
+        def wrapped(n):
+            start = time.time()
+            result = func(n)
+            end = time.time()
+            return end - start
+    return wrapped
 
 if __name__ == "__main__":
     print("[+] BloomFilter class loaded direcly.")
