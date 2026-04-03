@@ -1,3 +1,18 @@
+"""
+Three Way Merge Sort
+
+Course:  CS361
+Section: 001
+Authors: 
+    Robert Vanderburg
+    Kiana Tarter
+    Neveah Martinez
+Project: 
+    Performance Analysis of 3-Way Merge Sort and Bloom
+    Filter-Based Breach Detection at Scale
+Filename: three_way_merge_sort.py
+"""
+
 import random
 import time
 import csv
@@ -54,16 +69,13 @@ def merge2(x, y):
     result.extend(y[j:])
     return result
 
-
 def gen_int(n):
     for i in range(n):
         return random.randint(2**20, 2**30)
 
 def gen_float(n):
     for i in range(n):
-        return random.uniform() # What float values should I use?
+        return random.uniform(32)
 
 
-def check_correctness():
-    return
 
