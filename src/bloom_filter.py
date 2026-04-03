@@ -59,7 +59,7 @@ class BloomFilter:
             result = func(n)
             end = time.time()
             return end - start
-    return wrapped
+        return wrapped
 
 if __name__ == "__main__":
     print("[+] BloomFilter class loaded direcly.")
