@@ -22,7 +22,7 @@ class BloomFilter:
         self.filter = self.init_filter()
         self.params = Hashing.make_params(7, 2**160+13, HASH_SEED)
 
-    def insert(self): ...
+    def insert(self, hex_password): ...
         # convert password from hex -> int
         # run hashing on the int and flip the 0 bits at the specified locs
         
@@ -32,15 +32,16 @@ class BloomFilter:
         # return true if matchall else false.
 
     @timed
-    def build(self): ...
-        # open training file
-        # for each pw:
-        # convert to integer k_int
-        # run k_int through hash 7 times
-        # flip the bit at each index returned
+    def build(self): 
+        passwords = self.read_training_data()
+        for hex in passwords:
+            self.insert(hex)
 
-    def read_training(self): ...
-        # read password from training.txt
+    def read_training_data(self):
+        with open("training.txt", "r") as r:
+            traning_data = r.read().splitlines()
+
+        return traning_data
 
     def read_holdout(self): ...
         # read passwords from holdout.txt
