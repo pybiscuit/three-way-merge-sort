@@ -22,14 +22,29 @@ class BloomFilter:
         self.filter = self.init_filter()
         self.params = Hashing.make_params(7, 2**160+13, HASH_SEED)
 
-    def insert(self): ...
+    def insert(self, password): 
         # convert password from hex -> int
         # run hashing on the int and flip the 0 bits at the specified locs
+        int_pass = int(password, 16)
+
+
+
+        
         
     def query(self): ...
         # convert password from hex -> int
         # run hashing on the int and check the bits at the specified locs
         # return true if matchall else false.
+
+    
+    
+    def find_index(bit_index):
+        byte_index = bit_index // 8
+        bit_offset = bit_index % 8
+
+        # python stores rightmost bit as position 0
+        bit_val = 1 << bit_offset
+        return (byte_index, bit_val)
 
     @timed
     def build(self): ...
