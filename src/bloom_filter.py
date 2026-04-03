@@ -12,7 +12,7 @@ Project:
     Filter-Based Breach Detection at Scale
 Filename: bloom_filter.py
 Description: Bloom Filter class containing methods for creating, inserting, and querying a bloom filter
-for password hashes. Supported by methods in Hashing.py.
+for password hashes. Supported by methods in Hashing.py..
 """
 import math
 from typing import Tuple, Boolean, List, Bytearray
