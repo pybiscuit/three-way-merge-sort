@@ -30,7 +30,7 @@ def load_passwords(prefix: str) -> List:
     return pw_data
 
 def write_password(pw_data: List) -> None: 
-    with open("training.txt", "a") as f:
+    with open("holdout.txt", "a") as f:
         for pw in pw_data:
             f.write(pw + "\n")
 
@@ -40,3 +40,6 @@ def get_prefixes() -> List:
 
 if __name__ == "__main__":
     print("[+] HIBP utilities have been loaded direcly.")
+    prefixes = get_prefixes()
+    for i in range(480, 535):
+        write_password(load_passwords(prefixes[i]))
