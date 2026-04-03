@@ -44,19 +44,25 @@ class BloomFilter:
 
     def read_training_data(self):
         with open("training.txt", "r") as r:
-            traning_data = r.read().splitlines()
+            training_data = r.read().splitlines()
 
-        return traning_data
+        return training_data
 
-    def read_holdout(self): ...
-        # read passwords from holdout.txt
+    def read_holdout_data(self): 
+        with open("holdout.txt", "r") as r:
+            holdout_data = r.read().splitlines()
+
+        return holdout_data
 
     def init_filter(self):
         return bytearray(math.ceil(8_700_000/8))
 
     @timed
-    def query_analysis(self): ...
-        # loop over 1000 passwords querying them.
+    def query_analysis(self): 
+        holdout_data = self.read_holdout_data()
+
+        for i in range(1000):
+            print(self.query(holdout_data[i]))
         
 
     def timed(func):
