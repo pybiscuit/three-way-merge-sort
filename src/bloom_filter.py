@@ -22,6 +22,11 @@ class BloomFilter:
         self.filter = self.init_filter()
         self.params = Hashing.make_params(7, 2**160+13, HASH_SEED)
 
+    def byte_map(index):
+        byte_index = index//8
+        bit_index = index % 8
+        return (byte_index, bit_index)
+
     def insert(self, hex_password): ...
         # convert password from hex -> int
         # run hashing on the int and flip the 0 bits at the specified locs
