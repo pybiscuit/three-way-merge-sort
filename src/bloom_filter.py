@@ -15,18 +15,26 @@ Description: Bloom Filter class containing methods for creating, inserting, and 
 for password hashes. Supported by methods in Hashing.py..
 """
 import math
-from typing import Tuple, Boolean, List, Bytearray
+import time
+from typing import Tuple, List
 from hashing import Hashing
 
 HASH_SEED = 0xCAFEBABE_DEAD10CC
 
+def timed(func):
+    def wrapped(self, *args, **kwargs):
+        start = time.time()
+        result = func(self, *args, **kwargs)
+        end = time.time()
+        return end - start
+    return wrapped
+ 
 class BloomFilter:
     def __init__(self):
         self.filter = self.init_filter()
         self.params = Hashing.make_params(7, 2**160+13, HASH_SEED)
 
-
-    def find_index(bit_index):
+    def find_index(self, bit_index: int) -> Tuple:
         byte_index = bit_index // 8
         bit_offset = bit_index % 8
 
@@ -38,7 +46,7 @@ class BloomFilter:
     def insert(self, hex_password: str) -> None:
         # convert password from hex -> int
         # run hashing on the int and flip the 0 bits at the specified locs
-        int_pass = int(password, 16)
+        int_pass = int(hex_password, 16)
 
         m = len(self.filter) * 8
         p = 2**160 + 13
@@ -50,8 +58,8 @@ class BloomFilter:
 
             self.filter[byte_index]= self.filter[byte_index] | bit_val
 
-     
-    def query(self, hashed_password: str) -> Boolean:
+    @timed
+    def query(self, hashed_password: str) -> bool:
         # convert password from hex -> int
         # run hashing on the int and check the bits at the specified locs
         # return true if matchall else false.
@@ -70,7 +78,6 @@ class BloomFilter:
                 return False
                 
         return True
-    
 
     @timed
     def build(self) -> None: 
@@ -104,7 +111,7 @@ class BloomFilter:
 
         return holdout_data
 
-    def init_filter(self) -> Bytearray:
+    def init_filter(self) -> bytearray:
         """
         Create bytearray that represents the bloom filter. Values for m are hard coded at present.
         The byte array is created using the ceiling of (m/8).
@@ -117,17 +124,22 @@ class BloomFilter:
     def query_analysis(self) -> None: 
         holdout_data = self.read_holdout_data()
 
-        for i in range(1000):
-            print(self.query(holdout_data[i]))
-        
+        holdout_size = len(holdout_data)
+        count = 0
 
-    def timed(func):
-        def wrapped(n):
-            start = time.time()
-            result = func(n)
-            end = time.time()
-            return end - start
-        return wrapped
+        for i in range(1000):
+            if self.query(holdout_data[i]):
+                count += 1
+
+        print(str(1000) + " : " + str(count) + " : " + (str(count/1000)))
+        count = 0
+
+        # for i in range(holdout_size):
+        #     if self.query(holdout_data[i]):
+        #         count += 1
+        
+        # print(str(holdout_size) + " : " + str(count) + " : " + (str(count/holdout_size)))
+   
 
 if __name__ == "__main__":
     print("[+] BloomFilter class loaded direcly.")
