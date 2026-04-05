@@ -11,6 +11,7 @@ Project:
     Filter-Based Breach Detection at Scale
 Filename: three_way_merge_sort.py
 """
+
 import random
 import time
 import csv
@@ -19,78 +20,104 @@ import matplotlib.pyplot as plt
 
 # Core merge helpers
 
-def merge2(x, y):
-    result = []
-    i = j = 0
-    while i < len(x) and j < len(y):
-        if x[i] <= y[j]:
-            result.append(x[i]); i += 1
-        else:
-            result.append(y[j]); j += 1
-    result.extend(x[i:])
-    result.extend(y[j:])
-    return result
+CHUNK_THRESHOLD = 64
 
-def merge3(a, b, c):
-    result = []
+
+def merge(arr, left, mid1, mid2, right):
+    """
+    Merges three sorted lists based on index.
+    """
+    # Temporary arrays for three parts
+    left_arr  = arr[left:mid1 + 1]
+    mid_arr   = arr[mid1 + 1:mid2 + 1]
+    right_arr = arr[mid2 + 1:right + 1]
+
+    left_index  = len(left_arr)
+    mid_index   = len(mid_arr)
+    right_index = len(right_arr)
+
     i = j = k = 0
-    while i < len(a) and j < len(b) and k < len(c):
-        if a[i] <= b[j] and a[i] <= c[k]:
-            result.append(a[i]); i += 1
-        elif b[j] <= a[i] and b[j] <= c[k]:
-            result.append(b[j]); j += 1
+    index = left
+
+    # Direct comparisons — no min_value scan, no redundant bounds checks
+    while i < left_index and j < mid_index and k < right_index:
+        if left_arr[i] <= mid_arr[j] and left_arr[i] <= right_arr[k]:
+            arr[index] = left_arr[i]; i += 1
+        elif mid_arr[j] <= left_arr[i] and mid_arr[j] <= right_arr[k]:
+            arr[index] = mid_arr[j]; j += 1
         else:
-            result.append(c[k]); k += 1
-    remaining = merge2(a[i:], b[j:])
-    remaining = merge2(remaining, c[k:])
-    result.extend(remaining)
-    return result
+            arr[index] = right_arr[k]; k += 1
+        index += 1
 
-# Iterative bottom-up 3-way merge sort
+    # Drain remaining elements
+    while i < left_index:
+        arr[index] = left_arr[i]; i += 1; index += 1
+    while j < mid_index:
+        arr[index] = mid_arr[j]; j += 1; index += 1
+    while k < right_index:
+        arr[index] = right_arr[k]; k += 1; index += 1
 
-def merge_sort_3way(arr):
-    n = len(arr)
-    if n <= 1:
-        return arr
+def three_way_merge_sort(arr, left, right):
+    """
+    Merge sort algorithm implementation. runs in O(nlgn).
 
-    # Start with chunks of size 1, triple the chunk size each pass
-    chunks = [[x] for x in arr]
+    Introduction to Algorithms 4E - Cormen, Leiserson, Rivest, and Stein
+    Sections: 2.3
 
-    while len(chunks) > 1:
-        merged = []
-        i = 0
-        while i < len(chunks):
-            if i + 2 < len(chunks):
-                merged.append(merge3(chunks[i], chunks[i+1], chunks[i+2]))
-                i += 3
-            elif i + 1 < len(chunks):
-                merged.append(merge2(chunks[i], chunks[i+1]))
-                i += 2
-            else:
-                merged.append(chunks[i])
-                i += 1
-        chunks = merged
+    https://www.geeksforgeeks.org/dsa/3-way-merge-sort/
 
-    return chunks[0]
-
-# Data generators 
+    :param arr: the array of elements to be sorted.
+    :param left: index of the left most element.
+    :param right: index of the right most element.
+    """
+    
+    # If the list only has a single element return
+    if right - left < CHUNK_THRESHOLD:
+        arr[left:right+1] = sorted(arr[left:right+1])
+        return
+    
+    # Find the two midpoints for a 3-way split
+    mid1 = left + (right - left) // 3
+    mid2 = left + 2 * (right - left) // 3
+    
+    # Recursively sort the sub arrays.
+    three_way_merge_sort(arr, left, mid1)
+    three_way_merge_sort(arr, mid1 + 1, mid2)
+    three_way_merge_sort(arr, mid2 + 1, right)
+    
+    # Merge the the sub arrays.
+    merge(arr, left, mid1, mid2, right)
 
 def gen_int(n):
-    return [random.randint(2**20, 2**30) for _ in range(n)]
+    """
+    Generate a random array of intergers [0, n).
+
+    :param n: number of intergers to create.
+    """
+    return [random.randint(1, 2**20) for _ in range(n)]
 
 def gen_float(n):
+    """
+    Generate a random array of floats [0.0, 1.0).
+    
+    :param n: number of floats to create.
+    """
     return [random.uniform(0.0, 1.0) for _ in range(n)]
 
-# Benchmarking 
-
 def benchmark(sizes, generator):
+    """
+    Provide performance benchmarking for three_way_merge_sort algorithm.
+
+    :param size: List of intergers represting the size of arrays to best benchmarked.
+    :param generator: generator function for creating arrays.
+    """
     times = []
     for n in sizes:
         exp = n.bit_length() - 1
         data = generator(n) # exclude I/O time
 
         t0 = time.perf_counter()
-        merge_sort_3way(data)
+        three_way_merge_sort(data, 0, len(data) - 1)
         t1 = time.perf_counter()
 
         elapsed = t1 - t0
@@ -138,8 +165,6 @@ def plot_results(sizes, int_times, float_times):
     plt.savefig("benchmark_plot.png", dpi=150)
     print("\nPlot saved to benchmark_plot.png")
     plt.show()
-
-# Main 
 
 def main():
     sizes = [2**e for e in range(20, 30)]
