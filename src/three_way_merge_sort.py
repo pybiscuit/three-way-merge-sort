@@ -142,7 +142,7 @@ def plot_results(sizes, int_times, float_times):
 # Main 
 
 def main():
-    sizes = [2**e for e in range(20, 25)] # REMEMBER TO CHANGE TO (20, 30)
+    sizes = [2**e for e in range(20, 30)]
 
     print("Benchmarking with integers …")
     int_times = benchmark(sizes, gen_int)
